@@ -72,7 +72,7 @@ public class MishMashActivity extends Activity implements OnClickListener {
 	@Override
 	public void onDestroy() {
 	   super.onDestroy();
-	   if (mHelper != null) mHelper.dispose();
-	   mHelper = null;
+	   //if (mHelper != null) mHelper.dispose();
+	   //mHelper = null;
 	}
 }
