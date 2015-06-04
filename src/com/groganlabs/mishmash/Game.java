@@ -100,19 +100,21 @@ public abstract class Game implements Parcelable {
 		Random rand = new Random();
 		int hint = rand.nextInt(numAvail);
 		Log.d("game", "hint: "+hint);
-		int jj = 0;
+		int jj = -1;
 		//Go back through the arrays, counting through the
 		//available indices until we get to the hint'th element
 		for(int ii = 0; ii < answerArr.length; ii++) {
-			if(jj == hint) {
-				answerArr[jj] = solutionArr[jj];
-				break;
-			}
-			if(answerArr[ii] != solutionArr[ii])
+			if(answerArr[ii] != solutionArr[ii]) {
 				jj++;
+			}
+
+			if(jj == hint) {
+				answerArr[ii] = solutionArr[ii];
+				return ii;
+			}
 			
 		}
-		return jj;
+		return -1;
 	}
 	
 	public void writeToParcel(Parcel dest, int flags) {

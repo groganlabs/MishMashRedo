@@ -32,12 +32,12 @@ public class NoMoreGamesDialog extends DialogFragment {
                 	   mListener.onNoMorePositiveClick(NoMoreGamesDialog.this);
                    }
                })
-               .setNeutralButton("Manage Games", new DialogInterface.OnClickListener() {
+               .setNeutralButton("Buy Pack", new DialogInterface.OnClickListener() {
             	   public void onClick(DialogInterface dialog, int which) {
             		  mListener.onNoMoreNeutralClick(NoMoreGamesDialog.this);
             	   }
                })
-               .setNegativeButton("Main Menu", new DialogInterface.OnClickListener() {
+               .setNegativeButton("Menu", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                 	   mListener.onNoMoreNegativeClick(NoMoreGamesDialog.this);
                    }

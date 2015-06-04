@@ -100,7 +100,6 @@ public abstract class GameActivity extends ActionBarActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
 		case R.id.menu_restart:
-			Log.d("game", "restart");
 			restartGame();
 			return true;
 		case R.id.menu_hint:
@@ -108,13 +107,10 @@ public abstract class GameActivity extends ActionBarActivity implements
 			return true;
 		case R.id.menu_main:
 			goToMainMenu();
-			// If the current game is !gameWone
-			// Ask user if they want to save
-			// if yes, save
-			// finish activity
 			return true;
 		case R.id.menu_new_game:
-			menuNewGame();
+			//menuNewGame();
+			startNewGame();
 			return true;
 		case R.id.menu_settings:
 			Intent intent = new Intent(this, MishMashSettings.class);

@@ -237,11 +237,11 @@ public class JumbleActivity extends GameActivity {
 	}
 	
 	protected void goToMainMenu() {
-		if(!mGame.gameWon() && gameChanged) {
+		/*if(!mGame.gameWon() && gameChanged) {
 			DialogFragment frag = new GoToMainMenuDialog();
 			frag.show(getSupportFragmentManager(), GAME_TAG);
 		}
-		else
+		else*/
 			finish();
 	}
 	
@@ -279,5 +279,5 @@ public class JumbleActivity extends GameActivity {
 		finish();
 		
 	}
-
+	
 }

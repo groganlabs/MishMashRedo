@@ -112,7 +112,7 @@ public class MishMashDB extends SQLiteOpenHelper {
 			where.append(" AND (" + COL_COMPLETED + " & " + game.getGameType() + ") != " + game.getGameType());
 		//if we're reusing and replaying, it doesn't matter 
 		
-		Log.d("db", "Where: "+where.toString());
+		//Log.d("db", "Where: "+where.toString());
 		Cursor res = db.query(GAME_TABLE, cols, where.toString(), null, null, null, null);
 		if(res.getCount() == 0)
 			return false;

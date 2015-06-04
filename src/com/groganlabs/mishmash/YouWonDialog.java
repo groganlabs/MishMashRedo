@@ -25,14 +25,14 @@ public class YouWonDialog extends DialogFragment {
                 	   mListener.onYouWonNewGameClick(YouWonDialog.this);
                    }
                })
-               .setNeutralButton("Stay Here", new DialogInterface.OnClickListener() {
+               .setNeutralButton("Yay!", new DialogInterface.OnClickListener() {
 				
             	   public void onClick(DialogInterface dialog, int which) {
             		  // do nothing? Let's try that.
 					
             	   }
                })
-               .setNegativeButton("Back to Menu", new DialogInterface.OnClickListener() {
+               .setNegativeButton("Main Menu", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                 	   mListener.onYouWonMenuClick(YouWonDialog.this);
                    }
