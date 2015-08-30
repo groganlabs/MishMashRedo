@@ -2,7 +2,7 @@ package com.groganlabs.mishmash;
 
 import android.content.Intent;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,10 +14,12 @@ import com.groganlabs.mishmash.NoMoreGamesDialog.NoMoreGamesListener;
 import com.groganlabs.mishmash.RestartDialog.RestartListener;
 import com.groganlabs.mishmash.YouWonDialog.YouWonListener;
 
-public abstract class GameActivity extends ActionBarActivity implements
+public abstract class GameActivity extends AppCompatActivity implements
 		NoMoreGamesListener, YouWonListener, RestartListener, NewGameListener, MainMenuListener  {
 	
 	public static String GAME_TAG = "game";
+	public static String PACK_ID_TAG = "packId";
+	public static String GAME_ID_TAG = "gameId";
 	
 	/**
 	 * Generates the dialog if there are no games to build

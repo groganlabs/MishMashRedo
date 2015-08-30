@@ -21,11 +21,22 @@ public class JumbleActivity extends GameActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		Bundle extras;
+		//if this was created with extras in the intent
+		if((extras = getIntent().getExtras()) != null) {
+			int packId = extras.getInt(PACK_ID_TAG);
+			int gameId = extras.getInt(GAME_ID_TAG);
+			try {
+				mGame = new JumbleGame(gameId, packId, this);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				// need to create dialog, "error loading selected game.
+				// Tap ok to load a random game or cancel to go back"
+			}
+		}
 		//see if we have a saved instance with a solution, if not we need to create one
-		//with the accompanying arrays
-		//if(savedInstanceState == null || savedInstanceState.getCharArray("solutionArr") == null) {
-		if(savedInstanceState == null || savedInstanceState.getParcelable(GAME_TAG) == null) {
+		//with the accompanying arrays 
+		else if(savedInstanceState == null || savedInstanceState.getParcelable(GAME_TAG) == null) {
 			try {
 				mGame = new JumbleGame(-1, -1, this);
 			} catch (Exception e1) {

@@ -16,3 +16,5 @@ proguard*
 *.log
 
 libs/
+
+.settings/org.eclipse.jdt.core.prefs

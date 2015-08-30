@@ -5,12 +5,10 @@ import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.AttributeSet;
 import android.view.View;
 
-public class JumbleView extends View {
-	//Paint object for displaying text
-	private Paint mTextPaint;
+public class CryptogramView extends View {
+private Paint mTextPaint;
 	
 	//Paint object for highlighting active text
 	private Paint mBgPaint;
@@ -33,7 +31,8 @@ public class JumbleView extends View {
 	//number of rows the game is broken into
 	private int mNumRows;
 	
-	//index of the "selected" character
+	//which character (in the puzzle array) is selected
+	// ie 'a', 'b', 'z', etc
 	private int mHighlighted = -1;
 	
 	//array of indices for the game/answer arrays to indicate
@@ -41,51 +40,13 @@ public class JumbleView extends View {
 	//mRowIndices[0] = 0 (first row start), [1] = second row start, etc
 	private int[] mRowIndices;
 	
-	/**
-	 * constructor used to create view from code
-	 * @param context
-	 */
-	public JumbleView(Context context) {
+
+	public CryptogramView(Context context) {
 		super(context);
 		mContext = context;
 		init();
 	}
 	
-	/**
-	 * Constructor used to create view from xml
-	 * @param context
-	 * @param attrs
-	 */
-	public JumbleView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		mContext = context;
-		init();
-	}
-	
-	public float getCharSize() {
-		return mCharSize;
-	}
-	
-	public int getNumRows() {
-		return mNumRows;
-	}
-	
-	public float getYPad() {
-		return mYPad;
-	}
-	
-	public int getXPad(int ii) {
-		if(ii < mNumRows) {
-			return mXPad[ii];
-		}
-		else {
-			return -1;
-		}
-	}
-	
-	/**
-	 * create Paint objects
-	 */
 	private void init() {
 		//We want the characters to be a minimum size
 		mFontSize = 18 * mContext.getResources().getDisplayMetrics().density;
@@ -97,7 +58,7 @@ public class JumbleView extends View {
 		mBgPaint.setColor(Color.BLUE);
 		mBgPaint.setStyle(Paint.Style.FILL);
 	}
-	
+
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
@@ -158,7 +119,7 @@ public class JumbleView extends View {
 		}
 		return retChar;
 	}
-
+	
 	/**
 	 * Set mHighlighted to the passed in value.
 	 * If the value is different, return true,
@@ -193,7 +154,7 @@ public class JumbleView extends View {
 		int maxRows = 10;
 		
 		// We want to get the required game elements each time we draw
-		JumbleGame game = ( (JumbleActivity) mContext).getGame();
+		CryptogramGame game = ( (CryptogramActivity) mContext).getGame();
 		String gameStr = game.getSolution();
 		char[] gameArray = game.getPuzzleArr();
 		char[] answerArray = game.getAnswerArr();
@@ -274,8 +235,8 @@ public class JumbleView extends View {
 					aCharPadding = (mCharSize-aCharWidth)/2f;
 					gCharPadding = (mCharSize-gCharWidth)/2f;
 					
-					//highlighting the selected letter
-					if(mRowIndices[ii]+jj == mHighlighted) {
+					//highlighting the selected letters
+					if(mHighlighted != -1 && gameArray[mRowIndices[ii]+jj] == gameArray[mHighlighted]) {
 						/*Log.d("jumbleView", "This should be highlighted");
 						Log.d("jumbleView", "Left: "+(mXPad[ii]+(mCharSize*jj)));
 						Log.d("jumbleView", "Top: "+(mCharSize*(2f*ii+1)+(mYPad*ii)-mCharSize));

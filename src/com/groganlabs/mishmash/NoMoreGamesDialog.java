@@ -17,9 +17,9 @@ public class NoMoreGamesDialog extends DialogFragment {
 	
 	NoMoreGamesListener mListener;
 	private String message = "To continue playing, you can\n" +
-			"Select \"reuse games\" or \"replay games\" in the settings page\n" +
+			"Select \"reuse games\" or \"replay games\" in the settings page\n"; /* +
 			"Finish any games in progress\n" +
-			"Buy another game pack.";
+			"Buy another game pack.";*/
 	
 	@Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -32,11 +32,11 @@ public class NoMoreGamesDialog extends DialogFragment {
                 	   mListener.onNoMorePositiveClick(NoMoreGamesDialog.this);
                    }
                })
-               .setNeutralButton("Buy Pack", new DialogInterface.OnClickListener() {
+               /*.setNeutralButton("Buy Pack", new DialogInterface.OnClickListener() {
             	   public void onClick(DialogInterface dialog, int which) {
             		  mListener.onNoMoreNeutralClick(NoMoreGamesDialog.this);
             	   }
-               })
+               })*/
                .setNegativeButton("Menu", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                 	   mListener.onNoMoreNegativeClick(NoMoreGamesDialog.this);

@@ -15,7 +15,7 @@ import android.util.Log;
 public class MishMashDB extends SQLiteOpenHelper {
 	public static final int latestVersion = 1;
 	
-	public static final int JUMBLE_MASK =1;
+	public static final int JUMBLE_MASK = 1;
 	public static final int CRYPTO_MASK = 2;
 	public static final int DROP_MASK = 4;
 	
@@ -102,6 +102,7 @@ public class MishMashDB extends SQLiteOpenHelper {
 		
 		StringBuilder where = new StringBuilder();
 		where.append("(" + COL_ELIGABLE + " & " + game.getGameType() + ") = " + game.getGameType());
+		
 		where.append(" AND " + GAME_TABLE_ID + " NOT IN (SELECT " + ACTIVE_GAME_GAME_ID + " FROM " +
 				ACTIVE_GAME_TABLE + ")");
 		//if we aren't reusing or replaying games, add COL_COMPLETED  = 0
@@ -112,11 +113,12 @@ public class MishMashDB extends SQLiteOpenHelper {
 			where.append(" AND (" + COL_COMPLETED + " & " + game.getGameType() + ") != " + game.getGameType());
 		//if we're reusing and replaying, it doesn't matter 
 		
-		//Log.d("db", "Where: "+where.toString());
+		Log.d("db", "Where: "+where.toString());
 		Cursor res = db.query(GAME_TABLE, cols, where.toString(), null, null, null, null);
 		if(res.getCount() == 0)
 			return false;
 		
+		Log.d("db", "res.getCount() = " + res.getCount());
 		Random rand = new Random();
 		res.moveToPosition(rand.nextInt(res.getCount()));
 		

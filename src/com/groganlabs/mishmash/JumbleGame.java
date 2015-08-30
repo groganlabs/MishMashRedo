@@ -5,7 +5,6 @@ import java.util.Random;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 public class JumbleGame extends Game {
 	protected int gameType = JUMBLE_GAME;
