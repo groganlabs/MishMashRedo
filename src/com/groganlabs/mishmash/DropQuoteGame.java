@@ -1,10 +1,12 @@
 package com.groganlabs.mishmash;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import android.content.Context;
 import android.os.Parcel;
+import android.util.Log;
 
 public class DropQuoteGame extends Game {
 	
@@ -32,6 +34,8 @@ public class DropQuoteGame extends Game {
 	@Override
 	protected void createGame() {
 		int counter = 0;
+		dqSolution = new char[solutionArr.length];
+		
 		for(int ii = 0; ii < solutionArr.length; ii++) {
 			if((solutionArr[ii] >= 'A' && solutionArr[ii] <= 'Z') || solutionArr[ii] == ' ') {
 				dqSolution[counter] = solutionArr[ii];
@@ -58,10 +62,7 @@ public class DropQuoteGame extends Game {
 	
 	public void initializeLetterCols(int cols, int rows) {
 		// TODO: Remove ability to resize
-		//Check to make sure we're actually changing the size
-		if(letterCols != null & letterCols.size() == cols)
-			return;
-		
+		// TODO: also remove tempLetterArray, just use the letterCols
 		ArrayList tempLetterArray = new ArrayList(cols);
 		
 		for(int ii = 0; ii < cols; ii++) {
@@ -114,5 +115,60 @@ public class DropQuoteGame extends Game {
 
 	public int getLength() {
 		return dqSolutionLength;
+	}
+	
+	@Override
+	public int getHint() {
+		//count how many indices are blank or have a wrong answer
+		int numAvail = 0, lastAvail = 0;
+		for(int ii = 0; ii < dqSolutionLength; ii++) {
+			if(answerArr[ii] != dqSolution[ii]) {
+				numAvail++;
+				lastAvail = ii;
+			}
+		}
+		Log.d("game", "numAvail: "+numAvail);
+		
+		//shouldn't happen, but just in case
+		if(numAvail == 0) {
+			Log.d("game", "Oops!");
+			return -1;
+		}
+		
+		if(numAvail == 1) {
+			answerArr[lastAvail] = dqSolution[lastAvail];
+			return lastAvail;
+		}
+		
+		//get a random number 
+		Random rand = new Random();
+		int hint = rand.nextInt(numAvail);
+		Log.d("game", "hint: "+hint);
+		int jj = -1;
+		//Go back through the arrays, counting through the
+		//available indices until we get to the hint'th mismatching element
+		for(int ii = 0; ii < answerArr.length; ii++) {
+			if(answerArr[ii] != dqSolution[ii]) {
+				jj++;
+			}
+
+			if(jj == hint) {
+				answerArr[ii] = dqSolution[ii];
+				return ii;
+			}
+			
+		}
+		return -1;
+	}
+
+	@Override
+	public Boolean gameWon() {
+		if(Arrays.equals(dqSolution, answerArr)) {
+			finishGame();
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 }

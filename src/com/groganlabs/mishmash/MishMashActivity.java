@@ -14,8 +14,8 @@ public class MishMashActivity extends Activity implements OnClickListener {
 	TextView jumble;
 	TextView settings;
 	
-	//IabHelper mHelper;
-	//Boolean helperSuccess;
+	IabHelper mHelper;
+	Boolean helperSuccess;
     
     /** Called when the activity is first created. */
     @Override
@@ -24,18 +24,29 @@ public class MishMashActivity extends Activity implements OnClickListener {
         setContentView(R.layout.main);
         
         // Part of the in-app billing stuff
-        // might be moved to loading screen
-        //String apiKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjyuCKHP8kRzC5uwfzanHTcDY25k5c98u2KiByFhFZDiaauxICsffOy9Ijpj8glj+VaVf261TvdkIkuqDEXBqRegrF2yDlvgZfceNINqL0EMJsJdIFSGiXXnirWEE3A4j6LT0HOjSif1UBDPXalnC+/CTc1C4QyBxTRJUpzERuEfQ34XtNaCJ6d9biH3XSiS2PRa87bdaTG3Dc5LaSqY+mtYHT3J2lP0FgbTQSYkmIJ7kG6iskcSZn/LsFAY4ZGTrCQE99SCDYiA8MQBk/oWZ7EcnEmDIYflWXsnS5TIbtV7Wz18QlsvBmNHryfw91SC7TqB8Bd/YP6Pqm0iX7ZhXUwIDAQAB";
-        //mHelper = new IabHelper(this, apiKey);
+        String apiKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjyuCKHP8kRzC5uwfzanHTcDY25k5c98u2KiByFhFZDiaauxICsffOy9Ijpj8glj+VaVf261TvdkIkuqDEXBqRegrF2yDlvgZfceNINqL0EMJsJdIFSGiXXnirWEE3A4j6LT0HOjSif1UBDPXalnC+/CTc1C4QyBxTRJUpzERuEfQ34XtNaCJ6d9biH3XSiS2PRa87bdaTG3Dc5LaSqY+mtYHT3J2lP0FgbTQSYkmIJ7kG6iskcSZn/LsFAY4ZGTrCQE99SCDYiA8MQBk/oWZ7EcnEmDIYflWXsnS5TIbtV7Wz18QlsvBmNHryfw91SC7TqB8Bd/YP6Pqm0iX7ZhXUwIDAQAB";
+        mHelper = new IabHelper(this, apiKey);
+        // only for dev, change to false for production
+        mHelper.enableDebugLogging(true, "mHelper");
         
-        //mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
-        //	public void onIabSetupFinished(IabResult result) {
-        //		helperSuccess = result.isSuccess();
-        //	         // Hooray, IAB is fully set up!
-        //	}
-        //});
+        mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+        	public void onIabSetupFinished(IabResult result) {
+        		helperSuccess = result.isSuccess();
+        	    if(!helperSuccess) {
+        	    	return;
+        	    }
+        	    
+        	    // just in case it was disposed of while we waited
+        	    if(mHelper == null) {
+        	    	return;
+        	    }
+        	    
+        	    
+        	}
+        });
         
         //get inventory purchased by player
+        
         //make sure database is up to date
         
         cryptogram = (TextView) findViewById(R.id.cryptoBtn);

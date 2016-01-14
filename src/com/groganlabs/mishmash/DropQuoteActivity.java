@@ -54,7 +54,7 @@ public class DropQuoteActivity extends GameActivity {
 		if(mGame != null) {
 			FrameLayout layout = new FrameLayout(this);
 			
-			LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+			LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 			
 			mView = new DropQuoteView(this);
 			mView.setLayoutParams(lp);
@@ -100,55 +100,67 @@ public class DropQuoteActivity extends GameActivity {
 
 	@Override
 	public void onRestartClick(DialogFragment dialog) {
-		// TODO Auto-generated method stub
-		
+		mGame.clearAnswer();
+		mView.setHighlight(-1);
+		mView.invalidate();
 	}
 
 	@Override
 	public void onNewGameSave(DialogFragment dialog) {
-		// TODO Auto-generated method stub
-		
+		mGame.saveGame();
+		startNewGame();
 	}
 
 	@Override
 	public void onNewGameNoSave(DialogFragment dialog) {
-		// TODO Auto-generated method stub
-		
+		startNewGame();
 	}
 
 	@Override
 	public void onMainMenuSave(DialogFragment dialog) {
-		// TODO Auto-generated method stub
-		
+		mGame.saveGame();
+		finish();
 	}
 
 	@Override
 	public void onMainMenuNoSave(DialogFragment dialog) {
-		// TODO Auto-generated method stub
-		
+		finish();
 	}
 
 	@Override
 	public void startNewGame() {
-		// TODO Auto-generated method stub
-		
+		try {
+			mGame = new DropQuoteGame(-1, -1, this);
+		} catch (Exception e) {
+			noMoreGames();
+		}
+		gameChanged = false;
+		mView.invalidate();
 	}
 
 	@Override
 	public void showHint() {
-		// TODO Auto-generated method stub
-		
+		int hint = mGame.getHint();
+		mView.setHighlight(hint);
+		mView.invalidate();
+		if(mGame.gameWon())
+			gameWon();
 	}
 
 	@Override
 	protected void menuNewGame() {
-		// TODO Auto-generated method stub
-		
+		if(!mGame.gameWon() && gameChanged) {
+			DialogFragment frag = new NewGameFromMenu();
+			frag.show(getSupportFragmentManager(), GAME_TAG);
+		}
+		else
+			startNewGame();
 	}
 
 	@Override
 	protected void goToMainMenu() {
-		// TODO Auto-generated method stub
-		
+		finish();
 	}
+	
+	
 }

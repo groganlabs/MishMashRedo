@@ -60,33 +60,49 @@ public class DropQuoteView extends View {
 		int w = MeasureSpec.getSize(wMS);
 		int h = MeasureSpec.getSize(hMS);
 		
-		/* TODO 
-		 * Need to update this so that on a resize, the game resizes but doesn't
-		 * recalculate the number of columns
-		 */
-		
-		float sqSize = minFontSize + sqPad*2 + lineWidth;
 		DropQuoteGame game = ((DropQuoteActivity) mContext).getGame();
 		
 		// If the default num of columns won't fit, readjust
 		// should only happen on very small devices
 		// Only do this on the first load, when game.letterCols = null
-		if(defaultCols * (sqSize) - lineWidth > w) {
-			actualCols = (int) Math.ceil(game.getLength() / (sqSize));
-			gameRows = (int) Math.ceil(game.getLength() / actualCols);
-			if(gameRows * 2 * sqSize > h) {
-				mFontSize = (float) Math.floor(h/(gameRows*2)) - 2*sqPad - lineWidth;
+		if(game.letterCols == null) {
+			if(defaultCols * (sqSize()) > w) {
+				actualCols = (int) Math.ceil(game.getLength() / (sqSize() + lineWidth));
+				gameRows = (int) Math.ceil(game.getLength() / actualCols);
+				if(gameRows * 2 * (sqSize() + lineWidth) > h) {
+					mFontSize = (float) Math.floor(h/(gameRows*2)) - 2*sqPad - lineWidth;
+				}
+				else {
+					mFontSize = minFontSize;
+				}
 			}
+			// Using default num of columns, stretch the game so it 
+			// fills the height or width
 			else {
-				mFontSize = minFontSize;
+				actualCols = defaultCols;
+				gameRows = (int) Math.ceil(game.getLength() / defaultCols);
+				
+				float wSize = (float) Math.ceil(w / actualCols);
+				float hSize = (float) Math.ceil(h / (gameRows * 2));
+				
+				if(wSize > hSize) {
+					mFontSize = hSize - 2*sqPad - lineWidth;
+				}
+				else {
+					mFontSize = wSize - 2*sqPad - lineWidth;
+				}
+			}
+			
+			game.initializeLetterCols(actualCols, gameRows);
+			letterRows = 0;
+			for(int ii = 0; ii < game.letterCols.size(); ii++) {
+				if(((ArrayList) game.letterCols.get(ii)).size() > letterRows) {
+					letterRows = ((ArrayList) game.letterCols.get(ii)).size();
+				}
 			}
 		}
-		// Using default num of columns, stretch the game so it 
-		// fills the height or width
+		// We've already setup the game, just need to resize it to fit
 		else {
-			actualCols = defaultCols;
-			gameRows = (int) Math.ceil(game.getLength() / defaultCols);
-			
 			float wSize = (float) Math.ceil(w / actualCols);
 			float hSize = (float) Math.ceil(h / (gameRows * 2));
 			
@@ -99,14 +115,6 @@ public class DropQuoteView extends View {
 		}
 		
 		mTextPaint.setTextSize(mFontSize);
-		
-		game.initializeLetterCols(actualCols, gameRows);
-		letterRows = 0;
-		for(int ii = 0; ii < game.letterCols.size(); ii++) {
-			if(((ArrayList) game.letterCols.get(ii)).size() > letterRows) {
-				letterRows = ((ArrayList) game.letterCols.get(ii)).size();
-			}
-		}
 		
 		// Game takes up all available space
 		setMeasuredDimension(w, h);
@@ -226,5 +234,9 @@ public class DropQuoteView extends View {
 	
 	private float sqSize() {
 		return mFontSize + (2 * sqPad);
+	}
+	
+	public void setHighlight(int hl) {
+		mHighlighted = hl;
 	}
 }
