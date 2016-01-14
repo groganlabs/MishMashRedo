@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.View;
 import android.view.View.MeasureSpec;
 
@@ -61,45 +62,12 @@ public class DropQuoteView extends View {
 		int h = MeasureSpec.getSize(hMS);
 		
 		DropQuoteGame game = ((DropQuoteActivity) mContext).getGame();
-		
+		mFontSize = minFontSize;
 		// If the default num of columns won't fit, readjust
 		// should only happen on very small devices
 		// Only do this on the first load, when game.letterCols = null
 		if(game.letterCols == null) {
-			if(defaultCols * (sqSize()) > w) {
-				actualCols = (int) Math.ceil(game.getLength() / (sqSize() + lineWidth));
-				gameRows = (int) Math.ceil(game.getLength() / actualCols);
-				if(gameRows * 2 * (sqSize() + lineWidth) > h) {
-					mFontSize = (float) Math.floor(h/(gameRows*2)) - 2*sqPad - lineWidth;
-				}
-				else {
-					mFontSize = minFontSize;
-				}
-			}
-			// Using default num of columns, stretch the game so it 
-			// fills the height or width
-			else {
-				actualCols = defaultCols;
-				gameRows = (int) Math.ceil(game.getLength() / defaultCols);
-				
-				float wSize = (float) Math.ceil(w / actualCols);
-				float hSize = (float) Math.ceil(h / (gameRows * 2));
-				
-				if(wSize > hSize) {
-					mFontSize = hSize - 2*sqPad - lineWidth;
-				}
-				else {
-					mFontSize = wSize - 2*sqPad - lineWidth;
-				}
-			}
-			
-			game.initializeLetterCols(actualCols, gameRows);
-			letterRows = 0;
-			for(int ii = 0; ii < game.letterCols.size(); ii++) {
-				if(((ArrayList) game.letterCols.get(ii)).size() > letterRows) {
-					letterRows = ((ArrayList) game.letterCols.get(ii)).size();
-				}
-			}
+			setupLetterCols(w, h);
 		}
 		// We've already setup the game, just need to resize it to fit
 		else {
@@ -120,38 +88,97 @@ public class DropQuoteView extends View {
 		setMeasuredDimension(w, h);
 	}
 	
+	private void setupLetterCols(int w, int h) {
+		DropQuoteGame game = ((DropQuoteActivity) mContext).getGame();
+		
+		if(defaultCols * sqSize() > w) {
+			actualCols = (int) Math.ceil((float)game.getLength() / (sqSize() + lineWidth));
+			gameRows = (int) Math.ceil((float)game.getLength() / actualCols);
+			if(gameRows * 2 * (sqSize() + lineWidth) > h) {
+				mFontSize = (float) Math.floor((float)h/(gameRows*2)) - 2*sqPad - lineWidth;
+			}
+			else {
+				mFontSize = minFontSize;
+			}
+		}
+		// Using default num of columns, stretch the game so it 
+		// fills the height or width
+		else {
+			actualCols = defaultCols;
+			gameRows = (int) Math.ceil((float)game.getLength() / defaultCols);
+			
+			float wSize = (float) Math.ceil((float)w / actualCols);
+			float hSize = (float) Math.ceil((float)h / (gameRows * 2));
+			
+			if(wSize > hSize) {
+				mFontSize = hSize - 2*sqPad - lineWidth;
+			}
+			else {
+				mFontSize = wSize - 2*sqPad - lineWidth;
+			}
+		}
+		
+		Log.d("DropView", "game length = "+game.getLength());
+		Log.d("DropView", "actualCols = " + actualCols);
+		
+		game.initializeLetterCols(actualCols, gameRows);
+		letterRows = 0;
+		for(int ii = 0; ii < game.letterCols.size(); ii++) {
+			if(((ArrayList) game.letterCols.get(ii)).size() > letterRows) {
+				letterRows = ((ArrayList) game.letterCols.get(ii)).size();
+			}
+		}
+	}
+	
 	@Override
 	protected void onDraw(Canvas canvas) {
 		float charWidth, charPadding;
 		Paint current;
-		DropQuoteGame game = ((DropQuoteGame)mContext).getGame();
-		for(int ii = 0; ii < actualCols; ii++) {
-			canvas.drawRect(ii * (sqSize()+lineWidth), 0, 
-					ii * (sqSize()+lineWidth) + sqSize(), 
+		Log.d("DropView", "gameRows = "+gameRows);
+		Log.d("DropView", "letterRows = "+letterRows);
+		DropQuoteGame game = ((DropQuoteActivity)mContext).getGame();
+		if(game.letterCols == null) {
+			setupLetterCols(getMeasuredWidth(), getMeasuredHeight());
+		}
+		
+		for(int col = 0; col < actualCols; col++) {
+			canvas.drawRect(col * (sqSize()+lineWidth), 0, 
+					col * (sqSize()+lineWidth) + sqSize(), 
 					sqSize()*letterRows,
 					mBgPaint);
 			
 			// Draw the letter columns on top
-			for(int jj = 0; jj < ((ArrayList<DqChar>)game.letterCols.get(ii)).size(); jj++) {
-				charWidth = mTextPaint.measureText(((DqChar)((ArrayList)game.letterCols.get(ii)).get(jj)).getLetterArr(), 0, 1);
-				charPadding = (mFontSize-charWidth)/2f;
-				canvas.drawText(((DqChar)((ArrayList)game.letterCols.get(ii)).get(jj)).getLetterArr(),
-						0, 1,
-						ii * (sqSize()+lineWidth) + sqPad + charPadding,
-						((letterRows-jj-1) * sqSize()) + sqPad,
-						mTextPaint);
-				if(((DqChar)((ArrayList)game.letterCols.get(ii)).get(jj)).isAnswerSet()) {
+			for(int jj = 0; jj < ((ArrayList<DqChar>)game.letterCols.get(col)).size(); jj++) {
+				if(((DqChar)((ArrayList)game.letterCols.get(col)).get(jj)).isAnswerSet()) {
 					// if mHighlight = answer, draw highlighted square
-					canvas.drawLine(ii * (sqSize()+lineWidth) + sqPad,
+					if(((DqChar)((ArrayList)game.letterCols.get(col)).get(jj)).getAnswer() == mHighlighted) {
+						canvas.drawRect(col * (sqSize()+lineWidth),
+								((letterRows-jj-1) * sqSize()),
+								(col+1) * (sqSize()+lineWidth) - lineWidth,
+								((letterRows-jj) * sqSize()),
+								mHiLightPaint);
+						
+					}
+					
+					canvas.drawLine(col * (sqSize()+lineWidth) + sqPad,
 							((letterRows-jj-1) * sqSize()) + sqPad,
-							ii * (sqSize()+lineWidth+1) - sqPad,
+							(col+1) * (sqSize()+lineWidth) - sqPad,
 							((letterRows-jj) * sqSize()) - sqPad,
 							mTextPaint);
+					
 				}
+				charWidth = mTextPaint.measureText(((DqChar)((ArrayList)game.letterCols.get(col)).get(jj)).getLetterArr(), 0, 1);
+				charPadding = (mFontSize-charWidth)/2f;
+				canvas.drawText(((DqChar)((ArrayList)game.letterCols.get(col)).get(jj)).getLetterArr(), 0, 1,
+						col * (sqSize()+lineWidth) + sqPad + charPadding,
+						((letterRows-jj) * sqSize()) - sqPad,
+						mTextPaint);
+				
+				//Log.d("DropView", "Drawing Y: "+ ((letterRows-jj) * sqSize()) - sqPad);
 			}
 		}
 		
-		float lettersHeight = letterRows * sqSize();
+		float lettersHeight = letterRows * sqSize() + lineWidth;
 		for(int ii = 0; ii < game.dqSolutionLength; ii++) {
 			if(game.dqSolution[ii] != ' ') {
 				if(ii == mHighlighted) {
@@ -161,31 +188,38 @@ public class DropQuoteView extends View {
 					current = mBgPaint;
 				}
 				canvas.drawRect((ii%actualCols)*(sqSize() + lineWidth),
-						lettersHeight + ((float) Math.floor(ii/gameRows) * (sqSize() + lineWidth)),
+						lettersHeight + ((float) Math.floor(ii/actualCols) * (sqSize() + lineWidth)),
 						(ii%actualCols)*(sqSize() + lineWidth) + sqSize(),
-						lettersHeight + ((float) Math.floor(ii/gameRows) * (sqSize() + lineWidth) + sqSize()),
+						lettersHeight + ((float) Math.floor(ii/actualCols) * (sqSize() + lineWidth) + sqSize()),
 						current);
 				if(game.answerArr[ii] >= 'A' && game.answerArr[ii] <= 'Z') {
 					charWidth = mTextPaint.measureText(game.answerArr, ii, 1);
 					charPadding = (mFontSize-charWidth)/2f;
 					canvas.drawText(game.answerArr, ii, 1, 
 							(ii%actualCols)*(sqSize() + lineWidth) + sqPad + charPadding,
-							lettersHeight + ((float)Math.floor(ii/gameRows) * (sqSize() + lineWidth)) + sqPad,
+							lettersHeight + ((float)Math.floor((float)ii/actualCols +1) * (sqSize() + lineWidth)) - sqPad,
 							mTextPaint);
 				}
+				//Log.d("DropView", "Drawing X: "+(ii%actualCols)*(sqSize() + lineWidth));
+				//Log.d("DropView", "Drawing Y: "+(lettersHeight + ((float) Math.floor(ii/actualCols) * (sqSize() + lineWidth))));
 			}
+			
 		}
 	}
 
 	public Boolean touched(float x, float y) {
 		// view was touched in the character columns
+		Log.d("DropView", "x = "+x);
+		Log.d("DropView", "y = "+y);
 		if(y < letterRows * sqSize()) {
+			Log.d("DropView", "In the letter columns");
 			// There's no square selected
 			if(mHighlighted == -1) return false;
 			
-			int row = letterRows -(int) Math.ceil(letterRows * sqSize()/y);
-			int col = (int) Math.floor(actualCols * (sqSize() + lineWidth)/x);
-			
+			int row = letterRows -(int) Math.ceil(y/sqSize());
+			int col = (int) (x/(sqSize() + lineWidth));
+			Log.d("DropView", "row = "+ row);
+			Log.d("DropView", "col = " + col);
 			// The touch was in a different column than the selected square
 			if(col != mHighlighted % actualCols) return false;
 			
@@ -200,7 +234,7 @@ public class DropQuoteView extends View {
 			}
 			
 			// There was no letter in the spot touched
-			if(((ArrayList)game.letterCols.get(col)).size() < row) return false;
+			if(((ArrayList)game.letterCols.get(col)).size() <= row) return false;
 			
 			//By now we have a character in the same column as the selected square
 			// that isn't the same as the current answer
@@ -213,19 +247,28 @@ public class DropQuoteView extends View {
 				}
 			}
 			game.answerArr[mHighlighted] = ((DqChar)((ArrayList)game.letterCols.get(col)).get(row)).getLetter();
+			int oldAnswer;
+			if((oldAnswer = ((DqChar)((ArrayList)game.letterCols.get(col)).get(row)).getAnswer()) >= 0) {
+				game.answerArr[oldAnswer] = 0;
+			}
 			((DqChar)((ArrayList)game.letterCols.get(col)).get(row)).setAnswer(mHighlighted);
 			return true;
 		}
 		// view was touched in the squares
 		else if(y < (letterRows * (mFontSize + 2*sqPad) + 
 				gameRows * (mFontSize + 2*sqPad + lineWidth))) {
+			Log.d("DropView", "In the game board");
 			DropQuoteGame game = ((DropQuoteActivity)mContext).mGame;
-			int row = letterRows -(int) Math.ceil(gameRows * (sqSize()+lineWidth)/(y - sqSize()*letterRows));
-			int col = (int) Math.floor(actualCols * (sqSize() + lineWidth)/x);
+			int row = (int) ((y - (sqSize() * letterRows) - lineWidth)/(sqSize() + lineWidth));
+			int col = (int) (x/(sqSize() + lineWidth));
 			int index = row * actualCols + col;
-			if(game.dqSolution[index] == ' ') return false;
+			Log.d("DropView", "row = "+ row);
+			Log.d("DropView", "col = " + col);
+			if(index >= game.getLength() || index < 0 || col >= actualCols || game.dqSolution[index] == ' ') return false;
 			
 			mHighlighted = index;
+			
+			Log.d("DropView", "mHighlighted = "+mHighlighted);
 			return true;
 		}
 		return false;

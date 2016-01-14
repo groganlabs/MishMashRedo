@@ -2,6 +2,7 @@ package com.groganlabs.mishmash;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 
 import android.content.Context;
@@ -15,11 +16,11 @@ public class DropQuoteGame extends Game {
 	
 	// 2d array of letters for the top of the puzzle
 	// contains DqChar objects
-	protected ArrayList letterCols;
+	protected ArrayList<ArrayList<DqChar>> letterCols;
 	
 	public DropQuoteGame(int game, int pack, Context context) throws Exception {
 		super(game, pack, context);
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	public DropQuoteGame(Parcel in) {
@@ -61,52 +62,27 @@ public class DropQuoteGame extends Game {
 	}
 	
 	public void initializeLetterCols(int cols, int rows) {
-		// TODO: Remove ability to resize
-		// TODO: also remove tempLetterArray, just use the letterCols
-		ArrayList tempLetterArray = new ArrayList(cols);
+		if(letterCols != null && letterCols.size() > 0) {
+			return;
+		}
 		
+		letterCols = new ArrayList<ArrayList<DqChar>>();
 		for(int ii = 0; ii < cols; ii++) {
-			tempLetterArray[ii] = new ArrayList(rows);
+			letterCols.add(new ArrayList<DqChar>(rows));
 		}
 		
 		for(int ii=0; ii < dqSolutionLength; ii++) {
 			if(dqSolution[ii] != ' ') {
-				tempLetterArray[ii%cols].add(new DqChar(dqSolution[ii]));
+				((ArrayList) letterCols.get(ii%cols)).add(new DqChar(dqSolution[ii]));
 			}
 		}
 		
 		// Shuffle the columns
 		Random random = new Random();
 		for(int ii = 0; ii < cols; ii++) {
-			Collections.shuffle(tempLetterArray[ii], random);
+			Collections.shuffle((ArrayList<DqChar>) letterCols.get(ii), random);
 		}
 		
-		int tempAnswer;
-		char tempLetter;
-		
-		// if we already had a letterCol array, we might have had answers stored in there
-		if(letterCols != null) {
-			// Loop through the nested arrays
-			for(int ii = 0; ii < letterCols.size(); ii++) {
-				for(int jj = 0; jj < letterCols[ii].size(); jj++) {
-					// If there is an answer
-					if(letterCols[ii][jj].isAnswerSet()) {
-						tempAnswer = letterCols[ii][jj].getAnswer();
-						tempLetter = letterCols[ii][jj].getLetter();
-						// Look through the new column for an equal but unused letter
-						int newIndex = tempLetterArray[tempAnswer%cols].indexOf(new DqChar(tempLetter));
-						if(newIndex != -1) {
-							tempLetterArray[tempAnswer%cols][newIndex].setAnswer(tempAnswer);
-						}
-						else {
-							Log.d("DQGame", "Error: Couldn't find a free letter");
-						}
-					}
-				}
-			}
-		}
-		
-		letterCols = tempLetterArray;
 	}
 	
 	public int getGameType() {

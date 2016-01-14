@@ -1,7 +1,9 @@
 package com.groganlabs.mishmash;
 
 public class DqChar {
+	//answer = the index of the answerArr we're linked to
 	private int answer;
+	//letter = the letter displayed
 	private char letter;
 	
 	public DqChar(char letter) {
@@ -38,7 +40,8 @@ public class DqChar {
 	public boolean equals(Object o) {
 		if(o == this) return true;
 		if(o == null) return false;
-		return o.answer == this.answer && o.letter == this.letter;
+		if(!(o instanceof DqChar)) return false; 
+		return ((DqChar)o).answer == this.answer && ((DqChar)o).letter == this.letter;
 	}
 }
 

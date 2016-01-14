@@ -71,13 +71,16 @@ public class DropQuoteActivity extends GameActivity {
 	}
 	
 	protected void gameWon() {
-		DialogFragment frag = new YouWonDialog();
+		android.support.v4.app.DialogFragment frag = new YouWonDialog();
 		frag.show(getSupportFragmentManager(), GAME_TAG);
 	}
 	
 	protected boolean gameTouch(float x, float y) {
 		if(mView.touched(x, y)) {
 			mView.invalidate();
+			if(mGame.gameWon()) {
+				gameWon();
+			}
 		}
 		// Ask the view what was touched
 		// Possible values - char, square or none
@@ -99,31 +102,31 @@ public class DropQuoteActivity extends GameActivity {
 	}
 
 	@Override
-	public void onRestartClick(DialogFragment dialog) {
+	public void onRestartClick(android.support.v4.app.DialogFragment dialog) {
 		mGame.clearAnswer();
 		mView.setHighlight(-1);
 		mView.invalidate();
 	}
 
 	@Override
-	public void onNewGameSave(DialogFragment dialog) {
+	public void onNewGameSave(android.support.v4.app.DialogFragment dialog) {
 		mGame.saveGame();
 		startNewGame();
 	}
 
 	@Override
-	public void onNewGameNoSave(DialogFragment dialog) {
+	public void onNewGameNoSave(android.support.v4.app.DialogFragment dialog) {
 		startNewGame();
 	}
 
 	@Override
-	public void onMainMenuSave(DialogFragment dialog) {
+	public void onMainMenuSave(android.support.v4.app.DialogFragment dialog) {
 		mGame.saveGame();
 		finish();
 	}
 
 	@Override
-	public void onMainMenuNoSave(DialogFragment dialog) {
+	public void onMainMenuNoSave(android.support.v4.app.DialogFragment dialog) {
 		finish();
 	}
 
@@ -150,7 +153,7 @@ public class DropQuoteActivity extends GameActivity {
 	@Override
 	protected void menuNewGame() {
 		if(!mGame.gameWon() && gameChanged) {
-			DialogFragment frag = new NewGameFromMenu();
+			android.support.v4.app.DialogFragment frag = new NewGameFromMenu();
 			frag.show(getSupportFragmentManager(), GAME_TAG);
 		}
 		else
@@ -161,6 +164,8 @@ public class DropQuoteActivity extends GameActivity {
 	protected void goToMainMenu() {
 		finish();
 	}
+
+	
 	
 	
 }
